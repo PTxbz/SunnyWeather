@@ -9,6 +9,11 @@ import com.example.sunnyweather.logic.Repository
 import com.example.sunnyweather.logic.model.Place
 
 class PlaceViewModel : ViewModel() {
+
+    fun saveplace(place: Place) = Repository.savePlace(place)
+    fun getSavePlace() = Repository.getSavedPlace()
+    fun isPlaceSaved() = Repository.isPlaceSave()
+
     private val searchLiveDate = MutableLiveData<String>()
 
     val placeList = ArrayList<Place>()

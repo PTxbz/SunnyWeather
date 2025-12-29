@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.sunnyweather.LogUtil
 import com.example.sunnyweather.R
 import com.example.sunnyweather.logic.model.Place
@@ -28,15 +30,24 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
         holder.itemView.setOnClickListener {
             val position = holder.adapterPosition
             val place = placeList[position]
-            val intent = Intent(parent.context, WeatherActivity::class.java).apply {
-                putExtra("location_lng", place.location.lng)
-                putExtra("location_lat", place.location.lat)
-                putExtra("place_name", place.name)
+            val activity = fragment.activity
+            if(activity is WeatherActivity){
+                activity.viewModel.locationLat = place.location.lat
+                activity.viewModel.locationLng = place.location.lng
+                activity.viewModel.placeName = place.name
+                activity.findViewById<DrawerLayout>(R.id.drawerLayout).closeDrawers()
+                activity.refreshWeather(activity.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh))
+            }else{
+                val intent = Intent(parent.context, WeatherActivity::class.java).apply {
+                    putExtra("location_lng", place.location.lng)
+                    putExtra("location_lat", place.location.lat)
+                    putExtra("place_name", place.name)
+                }
+                LogUtil.d("debug","start WeatherActivity")
+                fragment.startActivity(intent)
+                fragment.activity?.finish()
             }
-            LogUtil.d("debug","start WeatherActivity")
             fragment.viewModel.saveplace(place)
-            fragment.startActivity(intent)
-            fragment.activity?.finish()
         }
         return holder
     }

@@ -107,45 +107,47 @@ object Repository {
 
 
     fun refreshWeather(lng: String, lat: String) = fire(Dispatchers.IO){
-//        coroutineScope{
-//            val deferredRealtime = async {
-//                SunnyWeatherNetwork.getRealtimeWeather(lng, lat)
-//            }
+        coroutineScope{
+            val deferredRealtime = async {
+                SunnyWeatherNetwork.getRealtimeWeather(lng, lat)
+            }
 //            val deferredDaily = async {
 //                SunnyWeatherNetwork.getDailyWeather(lng, lat)
 //            }
-//            val realtimeResponse = deferredRealtime.await()
+            val realtimeResponse = deferredRealtime.await()
 //            val dailyResponse = deferredDaily.await()
-//            LogUtil.d("debug", "实时天气响应体: ${realtimeResponse.status}")
-//            LogUtil.d("debug", "每日天气响应体: ${dailyResponse.status}")
-//
-//            if(realtimeResponse.status=="ok" && dailyResponse.status=="ok"){
-//                val weather = Weather(realtimeResponse.result.realtime, dailyResponse.result.daily)
-//                Result.success(weather)
-//            }else{
-//                Result.failure(
-//                    RuntimeException("realtime response status is ${realtimeResponse.status}" +
-//                            "daily response status is ${dailyResponse.status}")
-//                )
-//            }
-//        }
+            val dailyResponse = buildDailyResponse()
 
-        val realtimeResponse = SunnyWeatherNetwork.getRealtimeWeather(lng, lat)
-        val dailyResponse = buildDailyResponse()
+            LogUtil.d("debug", "实时天气响应体: ${realtimeResponse.status}")
+            LogUtil.d("debug", "每日天气响应体: ${dailyResponse.status}")
 
-        LogUtil.d("debug", "实时天气响应体: ${realtimeResponse}")
-        LogUtil.d("debug", "每日天气响应体: ${dailyResponse}")
-
-//        if(realtimeResponse.status=="ok" && dailyResponse.status=="ok"){
-        if(realtimeResponse.status=="ok"){
-            val weather = Weather(realtimeResponse.result.realtime, dailyResponse.result.daily)
-            Result.success(weather)
-        }else{
-            Result.failure(
-                RuntimeException("realtime response status is ${realtimeResponse.status}" +
-                        "daily response status is ${dailyResponse.status}")
-            )
+            if(realtimeResponse.status=="ok" && dailyResponse.status=="ok"){
+                val weather = Weather(realtimeResponse.result.realtime, dailyResponse.result.daily)
+                Result.success(weather)
+            }else{
+                Result.failure(
+                    RuntimeException("realtime response status is ${realtimeResponse.status}" +
+                            "daily response status is ${dailyResponse.status}")
+                )
+            }
         }
+
+//        val realtimeResponse = SunnyWeatherNetwork.getRealtimeWeather(lng, lat)
+//        val dailyResponse = buildDailyResponse()
+//
+//        LogUtil.d("debug", "实时天气响应体: ${realtimeResponse}")
+//        LogUtil.d("debug", "每日天气响应体: ${dailyResponse}")
+//
+////        if(realtimeResponse.status=="ok" && dailyResponse.status=="ok"){
+//        if(realtimeResponse.status=="ok"){
+//            val weather = Weather(realtimeResponse.result.realtime, dailyResponse.result.daily)
+//            Result.success(weather)
+//        }else{
+//            Result.failure(
+//                RuntimeException("realtime response status is ${realtimeResponse.status}" +
+//                        "daily response status is ${dailyResponse.status}")
+//            )
+//        }
     }
     private fun <T> fire(context : CoroutineContext, block:suspend ()-> Result<T>) =
         liveData<Result<T>>(context){
